@@ -1,0 +1,62 @@
+spring:
+  shardingsphere:
+    #数据源名称，多数据源以逗号分隔(这个数据源名称下面会用到)
+    datasource:
+      names: ds-master-0,ds-master-1
+      #上面配置的数据源名称ds-master-0，用于指向这个datasource
+      ds-master-0:
+        #数据库连接池类名称
+        type: com.alibaba.druid.pool.DruidDataSource
+        #数据库驱动类名
+        driverClassName: com.mysql.jdbc.Driver
+        #数据库url连接
+        url: jdbc:mysql://127.0.0.1:3306/ds-master-0?useUnicode=true&characterEncoding=utf8&tinyInt1isBit=false&useSSL=false&serverTimezone=GMT
+        #数据库用户名
+        username: root
+        #数据库密码
+        password: root
+        #同理-同上面
+      ds-master-1:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driverClassName: com.mysql.jdbc.Driver
+        url: jdbc:mysql://127.0.0.1:3306/ds-master-1?useUnicode=true&characterEncoding=utf8&tinyInt1isBit=false&useSSL=false&serverTimezone=GMT
+        username: root
+        password: root
+    #由数据源名 + 表名组成，以小数点分隔。多个表以逗号分隔，支持inline表达式。缺省表示使用已知数据源与逻辑表名称生成数据节点。用于广播表（即每个库中都需要一个同样的表用于关联查询，多为字典表）或只分库不分表且所有库的表结构完全一致的情况
+    sharding:
+      tables:
+        t_user:
+          actual-data-nodes: ds-master-$->{0..1}.t_user_$->{0..4}
+          ## 指定分库规则
+          database-strategy:
+            inline:
+              sharding-column: id
+              #分片算法行表达式（只取最后两个数字进行分片）
+              algorithm-expression: ds-master-$->{id % 2}
+          ## 指定分表规则
+          table-strategy:
+            inline:
+              sharding-column: id
+              #分片算法行表达式（只取最后两个数字进行分片）
+              algorithm-expression: t_user_$->{id % 5}
+          ## 生成分布式主键
+          key-generator:
+            #自增列名称，缺省表示不使用自增主键生成器
+            column: id
+            #自增列值生成器类型，缺省表示使用默认自增列值生成器。可使用用户自定义的列值生成器或选择内置类型：SNOWFLAKE/UUID/LEAF_SEGMENT
+            type: SNOWFLAKE
+
+#      绑定主表与子表，避免关联查询导致的全数据源路由
+#      binding-tables: user
+#      配置广播表：以广播的形式保存（如果只涉及查询的话可以不配置，会随机取一个数据源）
+#      broadcast-tables: t_config
+
+    # 打印sql
+    props:
+      sql:
+        show: true
+
+#使用了mybatis-plus
+mybatis-plus:
+  mapper-locations: classpath*:mappers/*.xml
+  map-underscore-to-camel-case: true
