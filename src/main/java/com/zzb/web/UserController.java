@@ -51,7 +51,6 @@ public class UserController {
     @GetMapping("/deleteOne")
     public Object deleteOne(@RequestParam Long id) {
         userService.deleteOne(id);
-        //userRepository.deleteAll();
         return "删除成功！";
     }
 
@@ -62,5 +61,12 @@ public class UserController {
         user.setUsername(username);
         userService.updateUser(user);
         return "更新成功！";
+    }
+
+
+    @GetMapping("/deleteAll")
+    public Object deleteAll() {
+        userRepository.deleteAll();
+        return "删除成功！";
     }
 }
