@@ -1,6 +1,7 @@
 package com.zzb;
 
 
+import com.zzb.util.IDKeyUtil;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -40,6 +40,8 @@ public class UserController {
     public Object add() {
         for(int i=1;i<=100;i++) {
             User user = new User();
+            //由于主键策略有问题，手动注入ID
+            user.setId(IDKeyUtil.generateId());
             user.setUsername("sharding-"+(i));
             user.setPassword("pw"+i);
            long resutl=   userService.addUser(user);
